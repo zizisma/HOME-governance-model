@@ -40,3 +40,20 @@ export async function POST(req: Request) {
   await kv.lpush("backstories", JSON.stringify(story));
   return NextResponse.json(story, { status: 201 });
 }
+
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+
+  const raw = await kv.lrange("backstories", 0, -1);
+  for (const item of raw) {
+    const parsed = typeof item === "string" ? JSON.parse(item) : item;
+    if (parsed.id === id) {
+      await kv.lrem("backstories", 0, typeof item === "string" ? item : JSON.stringify(item));
+      break;
+    }
+  }
+
+  return NextResponse.json({ ok: true });
+}

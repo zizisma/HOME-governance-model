@@ -55,6 +55,7 @@ export default function BackStoriesPage() {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/stories")
@@ -101,6 +102,17 @@ export default function BackStoriesPage() {
       }
     } catch {
       // story remains visible locally even if the save fails
+    }
+  }
+
+  async function deleteStory(id: string) {
+    if (deleting) return;
+    setDeleting(id);
+    setStories((prev) => prev.filter((s) => s.id !== id));
+    try {
+      await fetch(`/api/stories?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    } finally {
+      setDeleting(null);
     }
   }
 
@@ -199,13 +211,23 @@ export default function BackStoriesPage() {
             {stories.map((s) => (
               <div
                 key={s.id}
-                className="break-inside-avoid mb-6 rounded-2xl p-5"
+                className="break-inside-avoid mb-6 rounded-2xl p-5 relative"
                 style={{
                   background: s.bg,
                   transform: `rotate(${s.rotate})`,
                   boxShadow: "3px 5px 16px rgba(0,0,0,0.4)",
                 }}
               >
+                {s.id.startsWith("u-") && (
+                  <button
+                    onClick={() => deleteStory(s.id)}
+                    className="absolute top-3 right-3 w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold opacity-40 hover:opacity-90 transition-opacity"
+                    style={{ background: s.fg, color: s.bg }}
+                    title="Remove this story"
+                  >
+                    ×
+                  </button>
+                )}
                 <div
                   className="w-3 h-3 rounded-full mx-auto mb-4 -mt-1"
                   style={{ background: s.fg, opacity: 0.4 }}
