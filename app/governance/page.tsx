@@ -437,12 +437,14 @@ function MeetingCard({
   canRSVP,
   onAttend,
   onDecline,
+  onReset,
 }: {
   meeting: Meeting;
   rsvp: MeetingRSVP;
   canRSVP: boolean;
   onAttend: () => void;
   onDecline: () => void;
+  onReset: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isPast = new Date(meeting.suggestedDate) < new Date();
@@ -545,7 +547,7 @@ function MeetingCard({
       )}
 
       {canRSVP && !isPast && (
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2 mt-4 items-center flex-wrap">
           {rsvp === null && (
             <>
               <button
@@ -565,14 +567,32 @@ function MeetingCard({
             </>
           )}
           {rsvp === "attending" && (
-            <span className="text-xs px-4 py-1.5 rounded-full font-medium" style={{ background: "#D4EAD0", color: "#2C4A2E" }}>
-              ✓ You&apos;re attending
-            </span>
+            <>
+              <span className="text-xs px-4 py-1.5 rounded-full font-medium" style={{ background: "#D4EAD0", color: "#2C4A2E" }}>
+                ✓ You&apos;re attending
+              </span>
+              <button
+                onClick={onReset}
+                className="text-xs transition-opacity hover:opacity-80 underline"
+                style={{ color: "var(--muted)" }}
+              >
+                Change
+              </button>
+            </>
           )}
           {rsvp === "declining" && (
-            <span className="text-xs px-4 py-1.5 rounded-full font-medium" style={{ background: "var(--sand-dark)", color: "var(--muted)" }}>
-              ✗ You declined
-            </span>
+            <>
+              <span className="text-xs px-4 py-1.5 rounded-full font-medium" style={{ background: "var(--sand-dark)", color: "var(--muted)" }}>
+                ✗ You declined
+              </span>
+              <button
+                onClick={onReset}
+                className="text-xs transition-opacity hover:opacity-80 underline"
+                style={{ color: "var(--muted)" }}
+              >
+                Change
+              </button>
+            </>
           )}
         </div>
       )}
@@ -781,6 +801,20 @@ export default function GovernancePage() {
           ...m,
           declines: [...m.declines.filter((d) => d !== "You"), "You"],
           attendees: m.attendees.filter((a) => a !== "You"),
+        };
+      })
+    );
+  }
+
+  function handleResetRSVP(id: string) {
+    setMeetingRSVPs((prev) => ({ ...prev, [id]: null }));
+    setAllMeetings((prev) =>
+      prev.map((m) => {
+        if (m.id !== id) return m;
+        return {
+          ...m,
+          attendees: m.attendees.filter((a) => a !== "You"),
+          declines: m.declines.filter((d) => d !== "You"),
         };
       })
     );
@@ -1038,6 +1072,7 @@ export default function GovernancePage() {
                   canRSVP={canVote}
                   onAttend={() => handleMeetingRSVP(m.id, "attending")}
                   onDecline={() => handleMeetingRSVP(m.id, "declining")}
+                  onReset={() => handleResetRSVP(m.id)}
                 />
               ))
             )}
@@ -1056,14 +1091,9 @@ export default function GovernancePage() {
             </p>
           </div>
 
-          {role === "guest" && (
+          {!isKeeper && (
             <div className="rounded-xl px-5 py-3 mb-6 text-sm" style={{ background: "var(--sand)", color: "var(--muted)" }}>
-              You&apos;re viewing as a <strong style={{ color: "var(--warm-brown)" }}>Guest</strong>. Switch to Member or Keeper to RSVP.
-            </div>
-          )}
-          {role === "member" && (
-            <div className="rounded-xl px-5 py-3 mb-6 text-sm" style={{ background: "var(--sand)", color: "var(--muted)" }}>
-              Members can RSVP to biweekly meetings but only <strong style={{ color: "var(--warm-brown)" }}>Keepers</strong> can suggest them.
+              Biweekly meetings are for <strong style={{ color: "var(--warm-brown)" }}>Keepers only</strong>. You can view them here but only Keepers can attend or suggest them.
             </div>
           )}
 
@@ -1103,9 +1133,10 @@ export default function GovernancePage() {
                   key={m.id}
                   meeting={m}
                   rsvp={meetingRSVPs[m.id] ?? null}
-                  canRSVP={canVote}
+                  canRSVP={isKeeper}
                   onAttend={() => handleMeetingRSVP(m.id, "attending")}
                   onDecline={() => handleMeetingRSVP(m.id, "declining")}
+                  onReset={() => handleResetRSVP(m.id)}
                 />
               ))
             )}
