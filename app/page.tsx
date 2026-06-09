@@ -1,14 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Monitor, Smartphone } from "lucide-react";
 import { useRole } from "@/lib/role-context";
-import { useViewMode } from "@/lib/view-mode-context";
 import { roleConfig, events, proposals, bedSpaces } from "@/lib/data";
 
 export default function Home() {
   const { role } = useRole();
-  const { mode, setMode } = useViewMode();
   const cfg = roleConfig[role];
   const nextEvents = events.slice(0, 3);
   const openProposals = proposals.filter((p) => p.status === "open").length;
@@ -30,7 +27,7 @@ export default function Home() {
           Third Home is a collectively-owned living space in Wolfsburg — for commuters, newcomers, and
           long-term residents. Run by the people who live here.
         </p>
-        <div className="flex gap-4 flex-wrap mb-8">
+        <div className="flex gap-4 flex-wrap">
           <Link
             href="/stay"
             className="px-6 py-3 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -45,35 +42,6 @@ export default function Home() {
           >
             How it works
           </Link>
-        </div>
-
-        {/* View mode toggle */}
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-medium" style={{ color: "var(--muted)" }}>View as:</span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setMode("desktop")}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all"
-              style={{
-                background: mode === "desktop" ? "var(--warm-brown)" : "var(--sand)",
-                color: mode === "desktop" ? "var(--background)" : "var(--muted)",
-              }}
-            >
-              <Monitor size={13} />
-              Laptop
-            </button>
-            <button
-              onClick={() => setMode("mobile")}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all"
-              style={{
-                background: mode === "mobile" ? "var(--terracotta)" : "var(--sand)",
-                color: mode === "mobile" ? "white" : "var(--muted)",
-              }}
-            >
-              <Smartphone size={13} />
-              Phone
-            </button>
-          </div>
         </div>
       </section>
 
