@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Story {
   id: string;
@@ -11,17 +11,7 @@ interface Story {
   rotate: string;
 }
 
-const noteColors = [
-  { bg: "#ffcc00", fg: "#11012e" },
-  { bg: "#ff018f", fg: "#ffffff" },
-  { bg: "#2a0c62", fg: "#ffcc00" },
-  { bg: "#ff6dc0", fg: "#11012e" },
-  { bg: "#ffe566", fg: "#11012e" },
-];
-
-const rotations = ["-2deg", "1.5deg", "-1deg", "2deg", "-0.5deg", "1deg"];
-
-const seed: Story[] = [
+const SEED_STORIES: Story[] = [
   {
     id: "s1",
     name: "Maximilian",
@@ -49,28 +39,45 @@ const seed: Story[] = [
 ];
 
 export default function BackStoriesPage() {
-  const [stories, setStories] = useState<Story[]>(seed);
+  const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function submit() {
-    if (!name.trim() || !text.trim()) return;
-    const i = stories.length % noteColors.length;
-    setStories((prev) => [
-      ...prev,
-      {
-        id: `u-${Date.now()}`,
-        name: name.trim(),
-        text: text.trim(),
-        bg: noteColors[i].bg,
-        fg: noteColors[i].fg,
-        rotate: rotations[prev.length % rotations.length],
-      },
-    ]);
-    setName("");
-    setText("");
-    setShowForm(false);
+  useEffect(() => {
+    fetch("/api/stories")
+      .then((r) => r.json())
+      .then((data: Story[]) => {
+        setStories([...data, ...SEED_STORIES]);
+        setLoading(false);
+      })
+      .catch(() => {
+        setStories(SEED_STORIES);
+        setLoading(false);
+      });
+  }, []);
+
+  async function submit() {
+    if (!name.trim() || !text.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/stories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, text }),
+      });
+      if (res.ok) {
+        const story: Story = await res.json();
+        setStories((prev) => [story, ...prev]);
+        setName("");
+        setText("");
+        setShowForm(false);
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -138,11 +145,11 @@ export default function BackStoriesPage() {
             <div className="flex gap-2 pt-1">
               <button
                 onClick={submit}
-                disabled={!name.trim() || !text.trim()}
+                disabled={!name.trim() || !text.trim() || submitting}
                 className="px-5 py-2 rounded-full text-sm font-semibold disabled:opacity-40 transition-opacity hover:opacity-90"
                 style={{ background: "var(--terracotta)", color: "white" }}
               >
-                Pin my story
+                {submitting ? "Saving…" : "Pin my story"}
               </button>
               <button
                 onClick={() => { setShowForm(false); setName(""); setText(""); }}
@@ -161,37 +168,40 @@ export default function BackStoriesPage() {
         className="rounded-3xl p-8 min-h-96"
         style={{ background: "var(--sand)" }}
       >
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
-          {stories.map((s) => (
-            <div
-              key={s.id}
-              className="break-inside-avoid mb-6 rounded-2xl p-5"
-              style={{
-                background: s.bg,
-                transform: `rotate(${s.rotate})`,
-                boxShadow: "3px 5px 16px rgba(0,0,0,0.4)",
-              }}
-            >
-              {/* Pin dot */}
+        {loading ? (
+          <p className="text-center text-sm" style={{ color: "var(--muted)" }}>Loading stories…</p>
+        ) : (
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
+            {stories.map((s) => (
               <div
-                className="w-3 h-3 rounded-full mx-auto mb-4 -mt-1"
-                style={{ background: s.fg, opacity: 0.4 }}
-              />
-              <div
-                className="text-xs font-bold uppercase tracking-widest mb-3 pb-2 border-b"
-                style={{ color: s.fg, borderColor: s.fg, opacity: 0.9 }}
+                key={s.id}
+                className="break-inside-avoid mb-6 rounded-2xl p-5"
+                style={{
+                  background: s.bg,
+                  transform: `rotate(${s.rotate})`,
+                  boxShadow: "3px 5px 16px rgba(0,0,0,0.4)",
+                }}
               >
-                {s.name}
+                <div
+                  className="w-3 h-3 rounded-full mx-auto mb-4 -mt-1"
+                  style={{ background: s.fg, opacity: 0.4 }}
+                />
+                <div
+                  className="text-xs font-bold uppercase tracking-widest mb-3 pb-2 border-b"
+                  style={{ color: s.fg, borderColor: s.fg, opacity: 0.9 }}
+                >
+                  {s.name}
+                </div>
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: s.fg }}
+                >
+                  {s.text}
+                </p>
               </div>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: s.fg }}
-              >
-                {s.text}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
