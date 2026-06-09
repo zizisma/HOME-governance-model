@@ -15,7 +15,9 @@ export default function StayPage() {
   }
 
   const price = (b: (typeof bedSpaces)[0]) =>
-    role === "guest" ? b.priceGuest : b.priceMember;
+    role === "guest" ? b.priceGuest : role === "keeper" ? b.priceKeeper : b.priceMember;
+
+  const priceUnit = role === "guest" ? "/night" : "/month";
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
@@ -28,7 +30,7 @@ export default function StayPage() {
           <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${roleConfig[role].color}`}>
             {roleConfig[role].label}
           </span>
-          . Members and Keepers contribute less.
+          . {role === "guest" ? "Guests pay nightly." : "Members and Keepers pay a monthly rate."}
         </p>
       </div>
 
@@ -96,8 +98,8 @@ export default function StayPage() {
                 <span
                   className="text-xs font-medium px-2 py-0.5 rounded-full"
                   style={{
-                    background: b.available ? "#D4EAD0" : "var(--sand-dark)",
-                    color: b.available ? "#2C4A2E" : "var(--muted)",
+                    background: b.available ? "#F4FF1E" : "var(--sand-dark)",
+                    color: b.available ? "#08122A" : "var(--muted)",
                   }}
                 >
                   {booked === b.id ? "Requested" : b.available ? "Available" : "Occupied"}
@@ -107,7 +109,7 @@ export default function StayPage() {
                 <div className="text-xl font-bold" style={{ color: "var(--terracotta)" }}>
                   €{price(b)}
                 </div>
-                <div className="text-xs" style={{ color: "var(--muted)" }}>/night</div>
+                <div className="text-xs" style={{ color: "var(--muted)" }}>{priceUnit}</div>
               </div>
             </div>
 

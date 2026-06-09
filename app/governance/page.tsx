@@ -2,8 +2,20 @@
 
 import { useState } from "react";
 import { useRole } from "@/lib/role-context";
-import { proposals as seedProposals, roleConfig, Proposal, Concern, Block } from "@/lib/data";
+import {
+  proposals as seedProposals,
+  meetings as seedMeetings,
+  roleConfig,
+  groupConfig,
+  Proposal,
+  Concern,
+  Block,
+  Meeting,
+  Group,
+} from "@/lib/data";
 import { daysUntil, cn } from "@/lib/utils";
+
+// ── Maps ──────────────────────────────────────────────────────────────────────
 
 const categoryLabel: Record<string, string> = {
   daily: "Daily ops",
@@ -24,7 +36,11 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   withdrawn: { label: "Withdrawn", color: "text-[#8C7B6E]" },
 };
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+
 type UserAction = "consented" | "concerned" | "blocked" | null;
+type MeetingRSVP = "attending" | "declining" | null;
+type Tab = "proposals" | "weekly" | "biweekly";
 
 interface LocalState {
   extraConsenters: number;
@@ -42,6 +58,8 @@ interface NewProposal {
   role: "member" | "keeper";
   pending: true;
 }
+
+// ── ProposalCard ──────────────────────────────────────────────────────────────
 
 function ProposalCard({
   proposal,
@@ -297,6 +315,8 @@ function ProposalCard({
   );
 }
 
+// ── NewProposalForm ───────────────────────────────────────────────────────────
+
 function NewProposalForm({
   role,
   onSubmit,
@@ -335,7 +355,6 @@ function NewProposalForm({
       </p>
 
       <div className="space-y-4">
-        {/* Category */}
         <div>
           <label className="text-xs font-semibold block mb-2" style={{ color: "var(--muted)" }}>Type</label>
           <div className="flex gap-2 flex-wrap">
@@ -364,7 +383,6 @@ function NewProposalForm({
           )}
         </div>
 
-        {/* Title */}
         <div>
           <label className="text-xs font-semibold block mb-1" style={{ color: "var(--muted)" }}>Title</label>
           <input
@@ -377,7 +395,6 @@ function NewProposalForm({
           />
         </div>
 
-        {/* Description */}
         <div>
           <label className="text-xs font-semibold block mb-1" style={{ color: "var(--muted)" }}>Details</label>
           <textarea
@@ -412,6 +429,263 @@ function NewProposalForm({
   );
 }
 
+// ── MeetingCard ───────────────────────────────────────────────────────────────
+
+function MeetingCard({
+  meeting,
+  rsvp,
+  canRSVP,
+  onAttend,
+  onDecline,
+}: {
+  meeting: Meeting;
+  rsvp: MeetingRSVP;
+  canRSVP: boolean;
+  onAttend: () => void;
+  onDecline: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const isPast = new Date(meeting.suggestedDate) < new Date();
+
+  return (
+    <div
+      className="rounded-2xl p-5 border-2 transition-all"
+      style={{
+        background: "var(--sand)",
+        borderColor:
+          rsvp === "attending" ? "var(--olive)" :
+          rsvp === "declining" ? "var(--terracotta)" :
+          "transparent",
+      }}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1">
+          {meeting.group && (
+            <div className="mb-2">
+              <span
+                className="text-xs px-2 py-0.5 rounded-full font-medium"
+                style={{
+                  background: groupConfig[meeting.group].bgColor,
+                  color: groupConfig[meeting.group].textColor,
+                }}
+              >
+                {groupConfig[meeting.group].label} · {groupConfig[meeting.group].floors}
+              </span>
+            </div>
+          )}
+          <div className="font-semibold text-sm" style={{ color: "var(--warm-brown)" }}>
+            {new Date(meeting.suggestedDate).toLocaleDateString("en-GB", {
+              weekday: "long", day: "numeric", month: "long",
+            })} at {meeting.suggestedTime}
+          </div>
+          <p className="text-xs mt-1" style={{ color: "var(--muted)" }}>
+            Suggested by <span className="font-medium">{meeting.suggestedBy}</span>{" "}
+            ({roleConfig[meeting.proposerRole].label})
+          </p>
+        </div>
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-xs px-3 py-1 rounded-full shrink-0"
+          style={{ background: "var(--sand-dark)", color: "var(--warm-brown)" }}
+        >
+          {expanded ? "Less" : "Agenda"}
+        </button>
+      </div>
+
+      <div className="flex items-center gap-4 mt-3">
+        <span className="text-xs font-medium" style={{ color: "var(--olive)" }}>
+          ✓ {meeting.attendees.length} attending
+        </span>
+        {meeting.declines.length > 0 && (
+          <span className="text-xs" style={{ color: "var(--muted)" }}>
+            ✗ {meeting.declines.length} can&apos;t make it
+          </span>
+        )}
+        {isPast && (
+          <span
+            className="text-xs px-2 py-0.5 rounded-full"
+            style={{ background: "var(--sand-dark)", color: "var(--muted)" }}
+          >
+            Past
+          </span>
+        )}
+      </div>
+
+      {expanded && (
+        <div className="mt-4 space-y-3">
+          <div>
+            <p className="text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>Agenda</p>
+            <p className="text-sm leading-relaxed" style={{ color: "var(--warm-brown)" }}>{meeting.agenda}</p>
+          </div>
+          {meeting.attendees.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>Confirmed attending</p>
+              <div className="flex flex-wrap gap-1">
+                {meeting.attendees.map((a) => (
+                  <span key={a} className="text-xs px-2 py-0.5 rounded-full" style={{ background: "#D4EAD0", color: "#2C4A2E" }}>
+                    {a}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {meeting.declines.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>Can&apos;t make it</p>
+              <div className="flex flex-wrap gap-1">
+                {meeting.declines.map((d) => (
+                  <span key={d} className="text-xs px-2 py-0.5 rounded-full" style={{ background: "var(--sand-dark)", color: "var(--muted)" }}>
+                    {d}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {canRSVP && !isPast && (
+        <div className="flex gap-2 mt-4">
+          {rsvp === null && (
+            <>
+              <button
+                onClick={onAttend}
+                className="px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-80"
+                style={{ background: "var(--olive)" }}
+              >
+                I&apos;m attending
+              </button>
+              <button
+                onClick={onDecline}
+                className="px-4 py-1.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-80"
+                style={{ background: "var(--cream)", color: "var(--muted)" }}
+              >
+                Can&apos;t make it
+              </button>
+            </>
+          )}
+          {rsvp === "attending" && (
+            <span className="text-xs px-4 py-1.5 rounded-full font-medium" style={{ background: "#D4EAD0", color: "#2C4A2E" }}>
+              ✓ You&apos;re attending
+            </span>
+          )}
+          {rsvp === "declining" && (
+            <span className="text-xs px-4 py-1.5 rounded-full font-medium" style={{ background: "var(--sand-dark)", color: "var(--muted)" }}>
+              ✗ You declined
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── SuggestMeetingForm ────────────────────────────────────────────────────────
+
+function SuggestMeetingForm({
+  type,
+  group,
+  proposerRole,
+  onSubmit,
+  onCancel,
+}: {
+  type: "weekly" | "biweekly";
+  group: Group | null;
+  proposerRole: "member" | "keeper";
+  onSubmit: (m: Meeting) => void;
+  onCancel: () => void;
+}) {
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("19:00");
+  const [agenda, setAgenda] = useState("");
+
+  function submit() {
+    if (!date || !agenda.trim()) return;
+    onSubmit({
+      id: `m-${Date.now()}`,
+      type,
+      group,
+      suggestedBy: "You",
+      proposerRole,
+      suggestedDate: date,
+      suggestedTime: time,
+      agenda: agenda.trim(),
+      attendees: ["You"],
+      declines: [],
+    });
+  }
+
+  return (
+    <div className="rounded-2xl p-5 border-2" style={{ background: "var(--sand)", borderColor: "var(--olive)" }}>
+      <h3 className="font-semibold text-sm mb-1" style={{ color: "var(--warm-brown)" }}>
+        {type === "weekly"
+          ? `Suggest a weekly meeting${group ? ` · ${groupConfig[group].label}` : ""}`
+          : "Suggest a biweekly Keeper meeting"}
+      </h3>
+      <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>
+        {type === "weekly"
+          ? "Propose a time for your group to meet. Members and Keepers can mark their attendance once posted."
+          : "Propose a time for all Keepers to meet across all three groups. For constitutional decisions."}
+      </p>
+
+      <div className="space-y-3">
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <label className="text-xs font-semibold block mb-1" style={{ color: "var(--muted)" }}>Date</label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-lg px-3 py-2 text-sm border focus:outline-none"
+              style={{ background: "var(--cream)", borderColor: "var(--sand-dark)", color: "var(--warm-brown)" }}
+            />
+          </div>
+          <div className="w-28">
+            <label className="text-xs font-semibold block mb-1" style={{ color: "var(--muted)" }}>Time</label>
+            <input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              className="w-full rounded-lg px-3 py-2 text-sm border focus:outline-none"
+              style={{ background: "var(--cream)", borderColor: "var(--sand-dark)", color: "var(--warm-brown)" }}
+            />
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-semibold block mb-1" style={{ color: "var(--muted)" }}>Agenda</label>
+          <textarea
+            value={agenda}
+            onChange={(e) => setAgenda(e.target.value)}
+            placeholder="What needs to be discussed at this meeting?"
+            rows={3}
+            className="w-full rounded-lg px-3 py-2 text-sm border resize-none focus:outline-none"
+            style={{ background: "var(--cream)", borderColor: "var(--sand-dark)", color: "var(--warm-brown)" }}
+          />
+        </div>
+        <div className="flex gap-2 pt-1">
+          <button
+            onClick={submit}
+            disabled={!date || !agenda.trim()}
+            className="px-5 py-2 rounded-full text-sm font-semibold text-white disabled:opacity-40 transition-opacity hover:opacity-90"
+            style={{ background: "var(--olive)" }}
+          >
+            Suggest meeting
+          </button>
+          <button
+            onClick={onCancel}
+            className="px-5 py-2 rounded-full text-sm transition-opacity hover:opacity-70"
+            style={{ color: "var(--muted)" }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
 const emptyLocalState: LocalState = {
   extraConsenters: 0,
   extraConcerns: [],
@@ -419,19 +693,51 @@ const emptyLocalState: LocalState = {
   userAction: null,
 };
 
+function newToProposal(p: NewProposal): Proposal {
+  return {
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    proposedBy: p.proposedBy,
+    role: p.role,
+    category: p.category,
+    status: "open",
+    createdAt: new Date().toISOString().slice(0, 10),
+    deadlineAt: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+    silentConsenters: 0,
+    blocks: [],
+    concerns: [],
+  };
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default function GovernancePage() {
   const { role } = useRole();
+
+  // tab
+  const [activeTab, setActiveTab] = useState<Tab>("proposals");
+
+  // proposals
   const [filter, setFilter] = useState<"all" | "open" | "closed">("open");
   const [showNewForm, setShowNewForm] = useState(false);
   const [newProposals, setNewProposals] = useState<NewProposal[]>([]);
-
   const [localStates, setLocalStates] = useState<Record<string, LocalState>>(() =>
     Object.fromEntries(seedProposals.map((p) => [p.id, { ...emptyLocalState }]))
   );
 
+  // meetings
+  const [userGroup, setUserGroup] = useState<Group>("group1");
+  const [allMeetings, setAllMeetings] = useState<Meeting[]>(seedMeetings);
+  const [meetingRSVPs, setMeetingRSVPs] = useState<Record<string, MeetingRSVP>>({});
+  const [showWeeklyForm, setShowWeeklyForm] = useState(false);
+  const [showBiweeklyForm, setShowBiweeklyForm] = useState(false);
+
   const canVote = role === "member" || role === "keeper";
   const canPropose = role === "member" || role === "keeper";
+  const isKeeper = role === "keeper";
 
+  // proposal handlers
   function handleConsent(id: string) {
     setLocalStates((prev) => ({
       ...prev,
@@ -458,154 +764,353 @@ export default function GovernancePage() {
     setShowNewForm(false);
   }
 
+  // meeting handlers
+  function handleMeetingRSVP(id: string, decision: "attending" | "declining") {
+    setMeetingRSVPs((prev) => ({ ...prev, [id]: decision }));
+    setAllMeetings((prev) =>
+      prev.map((m) => {
+        if (m.id !== id) return m;
+        if (decision === "attending") {
+          return {
+            ...m,
+            attendees: [...m.attendees.filter((a) => a !== "You"), "You"],
+            declines: m.declines.filter((d) => d !== "You"),
+          };
+        }
+        return {
+          ...m,
+          declines: [...m.declines.filter((d) => d !== "You"), "You"],
+          attendees: m.attendees.filter((a) => a !== "You"),
+        };
+      })
+    );
+  }
+
+  function handleNewMeeting(m: Meeting) {
+    setAllMeetings((prev) => [m, ...prev]);
+    if (m.type === "weekly") setShowWeeklyForm(false);
+    else setShowBiweeklyForm(false);
+  }
+
   const filtered = seedProposals.filter((p) => {
     if (filter === "open") return p.status === "open";
     if (filter === "closed") return p.status !== "open";
     return true;
   });
-
   const openCount = seedProposals.filter((p) => p.status === "open").length;
 
-  // Convert NewProposal to the shape ProposalCard expects
-  function newToProposal(p: NewProposal): Proposal {
-    return {
-      id: p.id,
-      title: p.title,
-      description: p.description,
-      proposedBy: p.proposedBy,
-      role: p.role,
-      category: p.category,
-      status: "open",
-      createdAt: new Date().toISOString().slice(0, 10),
-      deadlineAt: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
-      silentConsenters: 0,
-      blocks: [],
-      concerns: [],
-    };
-  }
+  const weeklyMeetings = allMeetings.filter((m) => m.type === "weekly" && m.group === userGroup);
+  const biweeklyMeetings = allMeetings.filter((m) => m.type === "biweekly");
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-12">
-      <div className="mb-10">
+      {/* Header */}
+      <div className="mb-8">
         <h1 className="text-4xl font-bold mb-3" style={{ color: "var(--warm-brown)" }}>Governance</h1>
         <p className="text-base max-w-2xl" style={{ color: "var(--muted)" }}>
-          HOME runs on consent. Proposals are open for a set period — silence means agreement.
-          Anyone can raise a concern; a block stops a proposal until it&apos;s resolved.
+          HOME runs on consent across three groups managing six floors. Proposals are open for a set
+          period — silence means agreement. Meetings are organised within groups weekly, and across
+          groups biweekly.
         </p>
       </div>
 
-      {/* How consent works */}
-      <section className="rounded-2xl p-6 mb-10" style={{ background: "var(--sand)" }}>
-        <h2 className="font-semibold text-sm mb-4" style={{ color: "var(--warm-brown)" }}>How it works</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          {[
-            { speed: "Daily", color: "var(--sand-dark)", textColor: "var(--warm-brown)", desc: "Immediate decisions by whoever is present. Kitchen, cleaning, logistics." },
-            { speed: "Weekly", color: "var(--olive)", textColor: "white", desc: "Community-level changes. Open 7 days. Members + Keepers participate." },
-            { speed: "Monthly", color: "var(--terracotta)", textColor: "white", desc: "Structural decisions. Open 30 days. Keepers must unanimously consent." },
-          ].map((tier) => (
-            <div key={tier.speed} className="rounded-xl p-4" style={{ background: tier.color }}>
-              <div className="font-bold text-sm mb-1" style={{ color: tier.textColor }}>{tier.speed}</div>
-              <p className="text-xs leading-relaxed" style={{ color: tier.textColor, opacity: 0.85 }}>{tier.desc}</p>
+      {/* Groups overview */}
+      <section className="grid grid-cols-3 gap-3 mb-8">
+        {(["group1", "group2", "group3"] as Group[]).map((g) => (
+          <div key={g} className="rounded-xl p-4" style={{ background: groupConfig[g].bgColor }}>
+            <div className="font-bold text-sm mb-0.5" style={{ color: groupConfig[g].textColor }}>
+              {groupConfig[g].label}
             </div>
-          ))}
-        </div>
+            <div className="text-xs mb-3 font-medium" style={{ color: groupConfig[g].textColor, opacity: 0.7 }}>
+              {groupConfig[g].floors}
+            </div>
+            <div className="space-y-0.5 text-xs" style={{ color: groupConfig[g].textColor }}>
+              <div>Keepers: <span className="font-semibold">2–3</span></div>
+              <div>Members: <span className="font-semibold">8–10</span></div>
+              <div>Guests: <span className="font-semibold">7–10</span></div>
+            </div>
+          </div>
+        ))}
       </section>
 
-      {!canVote && (
-        <div className="rounded-xl px-5 py-3 mb-8 text-sm" style={{ background: "var(--sand)", color: "var(--muted)" }}>
-          You&apos;re viewing as a <strong style={{ color: "var(--warm-brown)" }}>Guest</strong>. Switch to Member or Keeper using the role selector in the nav to participate in governance.
-        </div>
-      )}
-
-      {/* Filter + new proposal button */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex gap-2">
-          {(["open", "all", "closed"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className="px-4 py-1.5 rounded-full text-xs font-medium capitalize transition-all"
-              style={{
-                background: filter === f ? "var(--warm-brown)" : "var(--sand)",
-                color: filter === f ? "var(--cream)" : "var(--muted)",
-              }}
-            >
-              {f} {f === "open" && `(${openCount})`}
-            </button>
-          ))}
-        </div>
-        {canPropose && !showNewForm && (
+      {/* Tabs */}
+      <div className="flex gap-0 mb-8 border-b" style={{ borderColor: "var(--sand-dark)" }}>
+        {([
+          { id: "proposals" as Tab, label: "Proposals" },
+          { id: "weekly" as Tab, label: "Weekly Meetings" },
+          { id: "biweekly" as Tab, label: "Biweekly Meetings" },
+        ]).map((t) => (
           <button
-            onClick={() => setShowNewForm(true)}
-            className="px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ background: "var(--olive)" }}
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className="px-5 py-2.5 text-sm font-medium transition-all -mb-px border-b-2"
+            style={{
+              borderColor: activeTab === t.id ? "var(--terracotta)" : "transparent",
+              color: activeTab === t.id ? "var(--terracotta)" : "var(--muted)",
+            }}
           >
-            + New proposal
+            {t.label}
           </button>
-        )}
-      </div>
-
-      {/* New proposal form */}
-      {showNewForm && canPropose && (
-        <div className="mb-6">
-          <NewProposalForm
-            role={role as "member" | "keeper"}
-            onSubmit={handleNewProposal}
-            onCancel={() => setShowNewForm(false)}
-          />
-        </div>
-      )}
-
-      {/* Newly submitted proposals */}
-      {newProposals.length > 0 && (
-        <div className="space-y-4 mb-4">
-          {newProposals.map((p) => (
-            <ProposalCard
-              key={p.id}
-              proposal={newToProposal(p)}
-              localState={emptyLocalState}
-              canVote={false}
-              onConsent={() => {}}
-              onConcern={() => {}}
-              onBlock={() => {}}
-              pending
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Seed proposals */}
-      <div className="space-y-4">
-        {filtered.map((p) => (
-          <ProposalCard
-            key={p.id}
-            proposal={p}
-            localState={localStates[p.id]}
-            canVote={canVote}
-            onConsent={() => handleConsent(p.id)}
-            onConcern={(text) => handleConcern(p.id, text)}
-            onBlock={(reason) => handleBlock(p.id, reason)}
-          />
         ))}
       </div>
 
-      {role === "keeper" && (
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--warm-brown)" }}>Keeper Circle</h2>
-          <div className="rounded-2xl p-6" style={{ background: "var(--sand)", borderLeft: "4px solid var(--terracotta)" }}>
-            <p className="text-sm mb-4" style={{ color: "var(--muted)" }}>
-              Structural proposals require unanimous Keeper consent. The next Keeper meeting is
-              <strong style={{ color: "var(--warm-brown)" }}> 25 May, 17:00</strong>.
+      {/* ── Proposals tab ─────────────────────────────────────────────────── */}
+      {activeTab === "proposals" && (
+        <>
+          <section className="rounded-2xl p-6 mb-10" style={{ background: "var(--sand)" }}>
+            <h2 className="font-semibold text-sm mb-4" style={{ color: "var(--warm-brown)" }}>Decision tiers</h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                {
+                  label: "Instant / Daily",
+                  color: "var(--sand-dark)", textColor: "var(--warm-brown)",
+                  desc: "Whoever is present decides on the spot. Food, welcoming new guests, fixing small things.",
+                },
+                {
+                  label: "Weekly group meetings",
+                  color: "var(--olive)", textColor: "#11012e",
+                  desc: "More complex decisions in weekly group meetings. Planning events, changing cleaning tasks, addressing noise.",
+                },
+                {
+                  label: "Biweekly Keeper meetings",
+                  color: "var(--terracotta)", textColor: "white",
+                  desc: "Constitutional decisions across all groups. New Keepers or Members, financial decisions, cross-group cooperation.",
+                },
+              ].map((tier) => (
+                <div key={tier.label} className="rounded-xl p-4" style={{ background: tier.color }}>
+                  <div className="font-bold text-sm mb-1" style={{ color: tier.textColor }}>{tier.label}</div>
+                  <p className="text-xs leading-relaxed" style={{ color: tier.textColor, opacity: 0.85 }}>{tier.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {!canVote && (
+            <div className="rounded-xl px-5 py-3 mb-8 text-sm" style={{ background: "var(--sand)", color: "var(--muted)" }}>
+              You&apos;re viewing as a <strong style={{ color: "var(--warm-brown)" }}>Guest</strong>. Switch to Member or Keeper using the role selector in the nav to participate.
+            </div>
+          )}
+
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex gap-2">
+              {(["open", "all", "closed"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className="px-4 py-1.5 rounded-full text-xs font-medium capitalize transition-all"
+                  style={{
+                    background: filter === f ? "var(--warm-brown)" : "var(--sand)",
+                    color: filter === f ? "var(--cream)" : "var(--muted)",
+                  }}
+                >
+                  {f} {f === "open" && `(${openCount})`}
+                </button>
+              ))}
+            </div>
+            {canPropose && !showNewForm && (
+              <button
+                onClick={() => setShowNewForm(true)}
+                className="px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ background: "var(--olive)" }}
+              >
+                + New proposal
+              </button>
+            )}
+          </div>
+
+          {showNewForm && canPropose && (
+            <div className="mb-6">
+              <NewProposalForm
+                role={role as "member" | "keeper"}
+                onSubmit={handleNewProposal}
+                onCancel={() => setShowNewForm(false)}
+              />
+            </div>
+          )}
+
+          {newProposals.length > 0 && (
+            <div className="space-y-4 mb-4">
+              {newProposals.map((p) => (
+                <ProposalCard
+                  key={p.id}
+                  proposal={newToProposal(p)}
+                  localState={emptyLocalState}
+                  canVote={false}
+                  onConsent={() => {}}
+                  onConcern={() => {}}
+                  onBlock={() => {}}
+                  pending
+                />
+              ))}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {filtered.map((p) => (
+              <ProposalCard
+                key={p.id}
+                proposal={p}
+                localState={localStates[p.id]}
+                canVote={canVote}
+                onConsent={() => handleConsent(p.id)}
+                onConcern={(text) => handleConcern(p.id, text)}
+                onBlock={(reason) => handleBlock(p.id, reason)}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* ── Weekly meetings tab ───────────────────────────────────────────── */}
+      {activeTab === "weekly" && (
+        <div>
+          <div className="rounded-xl p-4 mb-6" style={{ background: "var(--sand)" }}>
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              Weekly meetings happen within each group — Keepers, Members and Guests plan and arrange
+              together. These cover <strong style={{ color: "var(--warm-brown)" }}>more complex decisions</strong> like
+              planning events, changing cleaning tasks, or addressing noise.
             </p>
-            <div className="text-sm" style={{ color: "var(--warm-brown)" }}>
-              <p className="font-semibold mb-2">Pending structural decisions:</p>
-              <ul className="list-disc list-inside space-y-1 text-sm" style={{ color: "var(--muted)" }}>
-                <li>Guest rate increase (proposal P3) — 1 block outstanding</li>
-                <li>VW funding proposal — to be introduced June</li>
-              </ul>
+          </div>
+
+          {/* Group selector */}
+          <div className="flex items-center gap-3 mb-6 flex-wrap">
+            <span className="text-sm font-medium" style={{ color: "var(--muted)" }}>Your group:</span>
+            <div className="flex gap-2 flex-wrap">
+              {(["group1", "group2", "group3"] as Group[]).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setUserGroup(g)}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-all border-2"
+                  style={{
+                    background: userGroup === g ? groupConfig[g].bgColor : "var(--sand)",
+                    color: userGroup === g ? groupConfig[g].textColor : "var(--muted)",
+                    borderColor: userGroup === g ? groupConfig[g].textColor : "transparent",
+                  }}
+                >
+                  {groupConfig[g].label} · {groupConfig[g].floors}
+                </button>
+              ))}
             </div>
           </div>
-        </section>
+
+          {!canVote && (
+            <div className="rounded-xl px-5 py-3 mb-6 text-sm" style={{ background: "var(--sand)", color: "var(--muted)" }}>
+              You&apos;re viewing as a <strong style={{ color: "var(--warm-brown)" }}>Guest</strong>. Switch to Member or Keeper to suggest or RSVP to meetings.
+            </div>
+          )}
+
+          {canVote && !showWeeklyForm && (
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => setShowWeeklyForm(true)}
+                className="px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ background: "var(--olive)" }}
+              >
+                + Suggest weekly meeting
+              </button>
+            </div>
+          )}
+
+          {showWeeklyForm && canVote && (
+            <div className="mb-6">
+              <SuggestMeetingForm
+                type="weekly"
+                group={userGroup}
+                proposerRole={role as "member" | "keeper"}
+                onSubmit={handleNewMeeting}
+                onCancel={() => setShowWeeklyForm(false)}
+              />
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {weeklyMeetings.length === 0 ? (
+              <div className="text-sm text-center py-12 rounded-2xl" style={{ background: "var(--sand)", color: "var(--muted)" }}>
+                No weekly meetings suggested yet for {groupConfig[userGroup].label}.
+                {canVote && " Be the first to suggest one."}
+              </div>
+            ) : (
+              weeklyMeetings.map((m) => (
+                <MeetingCard
+                  key={m.id}
+                  meeting={m}
+                  rsvp={meetingRSVPs[m.id] ?? null}
+                  canRSVP={canVote}
+                  onAttend={() => handleMeetingRSVP(m.id, "attending")}
+                  onDecline={() => handleMeetingRSVP(m.id, "declining")}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Biweekly meetings tab ─────────────────────────────────────────── */}
+      {activeTab === "biweekly" && (
+        <div>
+          <div className="rounded-xl p-4 mb-6" style={{ background: "var(--sand)" }}>
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              Biweekly meetings bring Keepers from all three groups together to handle{" "}
+              <strong style={{ color: "var(--warm-brown)" }}>constitutional decisions</strong> — inviting new Keepers
+              or Members, financial and structural decisions, and cooperation between groups and floors.
+            </p>
+          </div>
+
+          {role === "guest" && (
+            <div className="rounded-xl px-5 py-3 mb-6 text-sm" style={{ background: "var(--sand)", color: "var(--muted)" }}>
+              You&apos;re viewing as a <strong style={{ color: "var(--warm-brown)" }}>Guest</strong>. Switch to Member or Keeper to RSVP.
+            </div>
+          )}
+          {role === "member" && (
+            <div className="rounded-xl px-5 py-3 mb-6 text-sm" style={{ background: "var(--sand)", color: "var(--muted)" }}>
+              Members can RSVP to biweekly meetings but only <strong style={{ color: "var(--warm-brown)" }}>Keepers</strong> can suggest them.
+            </div>
+          )}
+
+          {isKeeper && !showBiweeklyForm && (
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => setShowBiweeklyForm(true)}
+                className="px-4 py-1.5 rounded-full text-xs font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ background: "var(--terracotta)" }}
+              >
+                + Suggest biweekly meeting
+              </button>
+            </div>
+          )}
+
+          {showBiweeklyForm && isKeeper && (
+            <div className="mb-6">
+              <SuggestMeetingForm
+                type="biweekly"
+                group={null}
+                proposerRole="keeper"
+                onSubmit={handleNewMeeting}
+                onCancel={() => setShowBiweeklyForm(false)}
+              />
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {biweeklyMeetings.length === 0 ? (
+              <div className="text-sm text-center py-12 rounded-2xl" style={{ background: "var(--sand)", color: "var(--muted)" }}>
+                No biweekly meetings suggested yet.
+                {isKeeper && " Suggest one above."}
+              </div>
+            ) : (
+              biweeklyMeetings.map((m) => (
+                <MeetingCard
+                  key={m.id}
+                  meeting={m}
+                  rsvp={meetingRSVPs[m.id] ?? null}
+                  canRSVP={canVote}
+                  onAttend={() => handleMeetingRSVP(m.id, "attending")}
+                  onDecline={() => handleMeetingRSVP(m.id, "declining")}
+                />
+              ))
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

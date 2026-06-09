@@ -46,6 +46,7 @@ export interface BedSpace {
   available: boolean;
   priceGuest: number;
   priceMember: number;
+  priceKeeper: number;
   amenities: string[];
 }
 
@@ -219,8 +220,9 @@ export const bedSpaces: BedSpace[] = [
     name: "Single A — Garden Side",
     description: "South-facing, overlooks the courtyard. The quietest room in the building.",
     available: true,
-    priceGuest: 22,
-    priceMember: 12,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
     amenities: ["Garden view", "Shared bathroom", "Reading lamp", "Storage locker"],
   },
   {
@@ -229,8 +231,9 @@ export const bedSpaces: BedSpace[] = [
     name: "Single B — Street Side",
     description: "More street noise but blackout curtain provided. Good light in the morning.",
     available: false,
-    priceGuest: 22,
-    priceMember: 12,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
     amenities: ["Blackout curtain", "Shared bathroom", "Reading lamp", "Storage locker"],
   },
   {
@@ -239,8 +242,9 @@ export const bedSpaces: BedSpace[] = [
     name: "Single C — Corner",
     description: "Corner room with two windows. More natural light than most.",
     available: true,
-    priceGuest: 22,
-    priceMember: 12,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
     amenities: ["Two windows", "Shared bathroom", "Reading lamp", "Storage locker"],
   },
   {
@@ -249,8 +253,9 @@ export const bedSpaces: BedSpace[] = [
     name: "Single D — Attic",
     description: "Sloped ceiling and a skylight. Compact but full of character.",
     available: true,
-    priceGuest: 22,
-    priceMember: 12,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
     amenities: ["Skylight", "Shared bathroom", "Reading lamp", "Storage locker"],
   },
   {
@@ -260,7 +265,8 @@ export const bedSpaces: BedSpace[] = [
     description: "Two beds, south-facing. Good for a travelling pair or a member who needs space.",
     available: true,
     priceGuest: 18,
-    priceMember: 10,
+    priceMember: 300,
+    priceKeeper: 150,
     amenities: ["Garden view", "Two beds", "Shared bathroom", "Small desk"],
   },
   {
@@ -270,7 +276,8 @@ export const bedSpaces: BedSpace[] = [
     description: "Two beds with good morning light. Blackout curtains on both windows.",
     available: true,
     priceGuest: 18,
-    priceMember: 10,
+    priceMember: 300,
+    priceKeeper: 150,
     amenities: ["Blackout curtains", "Two beds", "Shared bathroom", "Small desk"],
   },
   {
@@ -280,7 +287,8 @@ export const bedSpaces: BedSpace[] = [
     description: "Corner position, cross ventilation. The most airy double room.",
     available: false,
     priceGuest: 18,
-    priceMember: 10,
+    priceMember: 300,
+    priceKeeper: 150,
     amenities: ["Cross ventilation", "Two beds", "Shared bathroom", "Small desk"],
   },
   {
@@ -290,7 +298,8 @@ export const bedSpaces: BedSpace[] = [
     description: "Two beds under a sloped ceiling with a large skylight. Popular in summer.",
     available: true,
     priceGuest: 18,
-    priceMember: 10,
+    priceMember: 300,
+    priceKeeper: 150,
     amenities: ["Skylight", "Two beds", "Shared bathroom", "Small desk"],
   },
   {
@@ -299,8 +308,9 @@ export const bedSpaces: BedSpace[] = [
     name: "Bunk Room A",
     description: "Four bunk beds, privacy curtains on each. Best value, great energy.",
     available: true,
-    priceGuest: 14,
-    priceMember: 8,
+    priceGuest: 15,
+    priceMember: 200,
+    priceKeeper: 100,
     amenities: ["4 beds", "Privacy curtains", "Shared bathroom", "Lockers", "Reading light"],
   },
   {
@@ -309,8 +319,120 @@ export const bedSpaces: BedSpace[] = [
     name: "Bunk Room B",
     description: "Four bunk beds with individual reading lights and lockable storage.",
     available: false,
-    priceGuest: 14,
-    priceMember: 8,
+    priceGuest: 15,
+    priceMember: 200,
+    priceKeeper: 100,
+    amenities: ["4 beds", "Privacy curtains", "Shared bathroom", "Lockers", "Reading light"],
+  },
+  // F2 / F3 rooms
+  {
+    id: "s5",
+    type: "single",
+    name: "Single E — F2 Garden Side",
+    description: "Second floor, south-facing with a wider view of the courtyard than the floor below.",
+    available: true,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
+    amenities: ["Garden view", "Shared bathroom", "Reading lamp", "Storage locker"],
+  },
+  {
+    id: "s6",
+    type: "single",
+    name: "Single F — F2 Street Side",
+    description: "Second floor street side. Slightly more noise, great morning light.",
+    available: true,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
+    amenities: ["Blackout curtain", "Shared bathroom", "Reading lamp", "Storage locker"],
+  },
+  {
+    id: "s7",
+    type: "single",
+    name: "Single G — F3 Corner",
+    description: "Third floor corner with views on two sides. Bright and quiet.",
+    available: false,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
+    amenities: ["Two windows", "Shared bathroom", "Reading lamp", "Storage locker"],
+  },
+  {
+    id: "s8",
+    type: "single",
+    name: "Single H — F3 Street Side",
+    description: "Third floor, higher up means less street noise than the floors below.",
+    available: true,
+    priceGuest: 20,
+    priceMember: 400,
+    priceKeeper: 200,
+    amenities: ["Blackout curtain", "Shared bathroom", "Reading lamp", "Storage locker"],
+  },
+  {
+    id: "d5",
+    type: "double",
+    name: "Double E — F2 Garden Side",
+    description: "Two beds overlooking the courtyard from the second floor. Calm and spacious.",
+    available: true,
+    priceGuest: 18,
+    priceMember: 300,
+    priceKeeper: 150,
+    amenities: ["Garden view", "Two beds", "Shared bathroom", "Small desk"],
+  },
+  {
+    id: "d6",
+    type: "double",
+    name: "Double F — F2 Corner",
+    description: "Corner double on the second floor with cross ventilation and two aspects.",
+    available: false,
+    priceGuest: 18,
+    priceMember: 300,
+    priceKeeper: 150,
+    amenities: ["Two windows", "Cross ventilation", "Two beds", "Shared bathroom", "Small desk"],
+  },
+  {
+    id: "d7",
+    type: "double",
+    name: "Double G — F3 Street Side",
+    description: "Third floor double. Higher position keeps it quieter than the lower street-side rooms.",
+    available: true,
+    priceGuest: 18,
+    priceMember: 300,
+    priceKeeper: 150,
+    amenities: ["Blackout curtains", "Two beds", "Shared bathroom", "Small desk"],
+  },
+  {
+    id: "d8",
+    type: "double",
+    name: "Double H — F4 Roof Terrace",
+    description: "Top floor double with direct access to the roof terrace. The most sought-after room.",
+    available: true,
+    priceGuest: 18,
+    priceMember: 300,
+    priceKeeper: 150,
+    amenities: ["Roof terrace access", "Two beds", "Shared bathroom", "Small desk"],
+  },
+  {
+    id: "bk3",
+    type: "bunk",
+    name: "Bunk Room C — F2",
+    description: "Second floor bunk room with four beds and a view of the courtyard from the window.",
+    available: true,
+    priceGuest: 15,
+    priceMember: 200,
+    priceKeeper: 100,
+    amenities: ["4 beds", "Privacy curtains", "Shared bathroom", "Lockers", "Reading light"],
+  },
+  {
+    id: "bk4",
+    type: "bunk",
+    name: "Bunk Room D — F3",
+    description: "Third floor bunk room. Quieter than the ground floor rooms, great natural light.",
+    available: true,
+    priceGuest: 15,
+    priceMember: 200,
+    priceKeeper: 100,
     amenities: ["4 beds", "Privacy curtains", "Shared bathroom", "Lockers", "Reading light"],
   },
 ];
@@ -374,29 +496,113 @@ export const people: Person[] = [
   },
 ];
 
+export type Group = "group1" | "group2" | "group3";
+
+export const groupConfig: Record<Group, { label: string; floors: string; bgColor: string; textColor: string }> = {
+  group1: { label: "Group 1", floors: "GF / F1", bgColor: "#1F6BED", textColor: "#FFFFFF" },
+  group2: { label: "Group 2", floors: "F2 / F3", bgColor: "#FF1EC7", textColor: "#FFFFFF" },
+  group3: { label: "Group 3", floors: "F4 / Roof", bgColor: "#ffcc00", textColor: "#11012e" },
+};
+
+export interface Meeting {
+  id: string;
+  type: "weekly" | "biweekly";
+  group: Group | null;
+  suggestedBy: string;
+  proposerRole: Role;
+  suggestedDate: string;
+  suggestedTime: string;
+  agenda: string;
+  attendees: string[];
+  declines: string[];
+}
+
+export const meetings: Meeting[] = [
+  {
+    id: "w1",
+    type: "weekly",
+    group: "group1",
+    suggestedBy: "Marta",
+    proposerRole: "keeper",
+    suggestedDate: "2026-06-12",
+    suggestedTime: "19:00",
+    agenda: "Composting bin proposal update, June film night planning, address noise complaints from F1.",
+    attendees: ["Marta", "Jonas"],
+    declines: [],
+  },
+  {
+    id: "w2",
+    type: "weekly",
+    group: "group2",
+    suggestedBy: "Reza",
+    proposerRole: "keeper",
+    suggestedDate: "2026-06-11",
+    suggestedTime: "18:30",
+    agenda: "Welcome new members, kitchen schedule for F2/F3, cleaning task rotation review.",
+    attendees: ["Reza", "Chen"],
+    declines: [],
+  },
+  {
+    id: "w3",
+    type: "weekly",
+    group: "group3",
+    suggestedBy: "Fatima",
+    proposerRole: "keeper",
+    suggestedDate: "2026-06-13",
+    suggestedTime: "19:30",
+    agenda: "Roof terrace access rules for summer, planning the June gathering.",
+    attendees: ["Fatima", "Ama"],
+    declines: [],
+  },
+  {
+    id: "b1",
+    type: "biweekly",
+    group: null,
+    suggestedBy: "Reza",
+    proposerRole: "keeper",
+    suggestedDate: "2026-06-14",
+    suggestedTime: "17:00",
+    agenda: "Guest rate increase (P3) — resolve Ama's block. VW funding proposal introduction. Cross-group library partnership update.",
+    attendees: ["Reza", "Marta", "Fatima"],
+    declines: [],
+  },
+  {
+    id: "b2",
+    type: "biweekly",
+    group: null,
+    suggestedBy: "Marta",
+    proposerRole: "keeper",
+    suggestedDate: "2026-05-25",
+    suggestedTime: "17:00",
+    agenda: "Ama's transition from Member to Keeper. Review Q1 accounts. Structural decisions from all three groups.",
+    attendees: ["Marta", "Reza", "Fatima", "Ama"],
+    declines: [],
+  },
+];
+
 export const roleConfig = {
   guest: {
     label: "Guest",
-    color: "bg-[#E8DDD0] text-[#2C1A0E]",
-    ring: "ring-[#D4C4B0]",
+    color: "bg-[#2a0c62] text-[#ffcc00]",
+    ring: "ring-[#3d1a8a]",
     description: "Staying 1–7 days. Full access to space and events.",
-    contribution: "€14–22/night",
+    contribution: "€15–20/night",
     hours: "None",
   },
   member: {
     label: "Member",
-    color: "bg-[#6B7C4E] text-white",
-    ring: "ring-[#6B7C4E]",
+    color: "bg-[#ff018f] text-white",
+    ring: "ring-[#ff6dc0]",
     description: "Committed for weeks or months. Shape the community.",
-    contribution: "€8–12/night",
+    contribution: "€200–400/month",
     hours: "2 hrs/week",
   },
   keeper: {
     label: "Keeper",
-    color: "bg-[#C5603B] text-white",
-    ring: "ring-[#C5603B]",
+    color: "bg-[#ffcc00] text-[#11012e]",
+    ring: "ring-[#ffe566]",
     description: "The stable core. Run HOME, hold the culture.",
-    contribution: "€0–4/night",
+    contribution: "€100–200/month",
     hours: "6–8 hrs/week",
   },
 };

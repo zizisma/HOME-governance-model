@@ -12,7 +12,7 @@ const links = [
   { href: "/events", label: "Events" },
   { href: "/stay", label: "Stay" },
   { href: "/community", label: "Community" },
-  { href: "/configure", label: "Configure" },
+  { href: "/backstories", label: "Back Stories" },
 ];
 
 export default function Nav() {
