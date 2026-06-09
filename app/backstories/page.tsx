@@ -11,6 +11,16 @@ interface Story {
   rotate: string;
 }
 
+const NOTE_COLORS = [
+  { bg: "#ffcc00", fg: "#11012e" },
+  { bg: "#ff018f", fg: "#ffffff" },
+  { bg: "#2a0c62", fg: "#ffcc00" },
+  { bg: "#ff6dc0", fg: "#11012e" },
+  { bg: "#ffe566", fg: "#11012e" },
+];
+
+const ROTATIONS = ["-2deg", "1.5deg", "-1deg", "2deg", "-0.5deg", "1deg"];
+
 const SEED_STORIES: Story[] = [
   {
     id: "s1",
@@ -62,21 +72,35 @@ export default function BackStoriesPage() {
   async function submit() {
     if (!name.trim() || !text.trim() || submitting) return;
     setSubmitting(true);
+
+    const idx = stories.length;
+    const optimistic: Story = {
+      id: `u-${Date.now()}`,
+      name: name.trim(),
+      text: text.trim(),
+      bg: NOTE_COLORS[idx % NOTE_COLORS.length].bg,
+      fg: NOTE_COLORS[idx % NOTE_COLORS.length].fg,
+      rotate: ROTATIONS[idx % ROTATIONS.length],
+    };
+
+    setStories((prev) => [optimistic, ...prev]);
+    setName("");
+    setText("");
+    setShowForm(false);
+    setSubmitting(false);
+
     try {
       const res = await fetch("/api/stories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, text }),
+        body: JSON.stringify({ name: optimistic.name, text: optimistic.text }),
       });
       if (res.ok) {
-        const story: Story = await res.json();
-        setStories((prev) => [story, ...prev]);
-        setName("");
-        setText("");
-        setShowForm(false);
+        const saved: Story = await res.json();
+        setStories((prev) => prev.map((s) => (s.id === optimistic.id ? saved : s)));
       }
-    } finally {
-      setSubmitting(false);
+    } catch {
+      // story remains visible locally even if the save fails
     }
   }
 
