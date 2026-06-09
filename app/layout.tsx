@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { RoleProvider } from "@/lib/role-context";
-import Nav from "@/components/Nav";
+import { ViewModeProvider } from "@/lib/view-mode-context";
+import AppShell from "@/components/AppShell";
 
 export const metadata: Metadata = {
   title: "Third Home — Wolfsburg",
@@ -13,8 +14,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
         <RoleProvider>
-          <Nav />
-          <main>{children}</main>
+          <ViewModeProvider>
+            <AppShell>{children}</AppShell>
+          </ViewModeProvider>
         </RoleProvider>
       </body>
     </html>
