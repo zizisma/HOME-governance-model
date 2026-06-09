@@ -288,7 +288,7 @@ export default function EventsPage() {
         <div>
           <h1 className="text-4xl font-bold mb-3" style={{ color: "var(--warm-brown)" }}>Events</h1>
           <p className="text-base" style={{ color: "var(--muted)" }}>
-            What&apos;s happening at HOME.
+            What&apos;s happening at Third Home.
             {role === "guest" ? " Some events are Members-only — join as a Member to access everything." : " All events are open to you."}
           </p>
         </div>

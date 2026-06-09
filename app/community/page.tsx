@@ -17,7 +17,7 @@ export default function CommunityPage() {
     { label: "Cooking", desc: "Host or help with communal meals" },
     { label: "Translation", desc: "Arabic, Turkish, English, German, and more" },
     { label: "Teaching", desc: "Share a skill — language, craft, code, anything" },
-    { label: "Music", desc: "Play at HOME events" },
+    { label: "Music", desc: "Play at Third Home events" },
     { label: "Maintenance", desc: "Fix, build, repair" },
     { label: "Photography", desc: "Document community life" },
   ];
@@ -27,7 +27,7 @@ export default function CommunityPage() {
       <div className="mb-10">
         <h1 className="text-4xl font-bold mb-3" style={{ color: "var(--warm-brown)" }}>Community</h1>
         <p className="text-base" style={{ color: "var(--muted)" }}>
-          The people who make HOME what it is.
+          The people who make Third Home what it is.
         </p>
       </div>
 
@@ -40,7 +40,7 @@ export default function CommunityPage() {
           </span>
         </div>
         <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
-          Keepers are here long-term. They run HOME, hold its culture, and make structural decisions by unanimous consent.
+          Keepers are here long-term. They run Third Home, hold its culture, and make structural decisions by unanimous consent.
           They contribute 6–8 hours of labour per week and pay the least in cash.
         </p>
         <div className="grid md:grid-cols-2 gap-4">
@@ -122,7 +122,7 @@ export default function CommunityPage() {
           Ways to contribute beyond money
         </h2>
         <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
-          HOME recognises six forms of contribution that count as much as cash — especially for newcomers and migrants
+          Third Home recognises six forms of contribution that count as much as cash — especially for newcomers and migrants
           who bring skills and knowledge that money can&apos;t buy.
         </p>
         <div className="grid md:grid-cols-3 gap-3">
@@ -142,7 +142,7 @@ export default function CommunityPage() {
         <section className="rounded-2xl p-8" style={{ background: "var(--sand)" }}>
           <h2 className="text-xl font-bold mb-2" style={{ color: "var(--warm-brown)" }}>Want to go deeper?</h2>
           <p className="text-sm mb-4" style={{ color: "var(--muted)" }}>
-            If HOME feels like somewhere you&apos;d want to stay longer, talk to a Keeper about becoming a Member.
+            If Third Home feels like somewhere you&apos;d want to stay longer, talk to a Keeper about becoming a Member.
             There&apos;s no application form — just a conversation.
           </p>
           <button
@@ -158,8 +158,8 @@ export default function CommunityPage() {
       <section className="mt-10 rounded-2xl p-6 border-l-4" style={{ background: "var(--sand)", borderColor: "var(--olive)" }}>
         <h3 className="font-semibold text-sm mb-2" style={{ color: "var(--warm-brown)" }}>The VW Firewall</h3>
         <p className="text-sm" style={{ color: "var(--muted)" }}>
-          Volkswagen contributes funding to HOME. They are explicitly excluded from all decision-making —
-          this is written into HOME&apos;s founding documents and cannot be changed without unanimous Keeper consent.
+          Volkswagen contributes funding to Third Home. They are explicitly excluded from all decision-making —
+          this is written into Third Home&apos;s founding documents and cannot be changed without unanimous Keeper consent.
           Their money funds the space. The space is ours.
         </p>
       </section>

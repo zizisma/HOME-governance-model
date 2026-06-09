@@ -4,7 +4,7 @@ import { RoleProvider } from "@/lib/role-context";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "HOME — Wolfsburg",
+  title: "Third Home — Wolfsburg",
   description: "A collectively-owned temporary living space in Wolfsburg",
 };
 

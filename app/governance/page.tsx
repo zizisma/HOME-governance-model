@@ -842,7 +842,7 @@ export default function GovernancePage() {
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-3" style={{ color: "var(--warm-brown)" }}>Governance</h1>
         <p className="text-base max-w-2xl" style={{ color: "var(--muted)" }}>
-          HOME runs on consent across three groups managing six floors. Proposals are open for a set
+          Third Home runs on consent across three groups managing six floors. Proposals are open for a set
           period — silence means agreement. Meetings are organised within groups weekly, and across
           groups biweekly.
         </p>

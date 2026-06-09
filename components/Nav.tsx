@@ -24,7 +24,7 @@ export default function Nav() {
       <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
         {/* Logo */}
         <Link href="/" className="text-2xl font-bold tracking-tight" style={{ color: "var(--terracotta)", fontFamily: "Georgia, serif" }}>
-          HOME
+          Third Home
           <span className="text-sm font-normal ml-2" style={{ color: "var(--muted)" }}>Wolfsburg</span>
         </Link>
 

@@ -25,7 +25,7 @@ const SEED_STORIES: Story[] = [
   {
     id: "s1",
     name: "Maximilian",
-    text: "57 years old, VW engineer for 29 years. Lives alone after his children moved out and his wife passed away five years ago. The idea of retirement terrified him — being completely alone with nothing to look forward to. He found HOME by accident through a co-worker who had been to a dinner and game night. He started showing up on weekends. A Keeper noticed how consistent he was and invited him to become a member. Two months later he was offered a Keeper role. He moved in. He now manages the finances, gives story times to kids every week, and does the gardening two or three mornings a week when the city is still quiet.",
+    text: "57 years old, VW engineer for 29 years. Lives alone after his children moved out and his wife passed away five years ago. The idea of retirement terrified him — being completely alone with nothing to look forward to. He found Third Home by accident through a co-worker who had been to a dinner and game night. He started showing up on weekends. A Keeper noticed how consistent he was and invited him to become a member. Two months later he was offered a Keeper role. He moved in. He now manages the finances, gives story times to kids every week, and does the gardening two or three mornings a week when the city is still quiet.",
     bg: "#ffcc00",
     fg: "#11012e",
     rotate: "-2deg",
@@ -33,7 +33,7 @@ const SEED_STORIES: Story[] = [
   {
     id: "s2",
     name: "Julian & Sarah",
-    text: "A couple from Hanover, together four years, thinking about starting a family. Sarah commutes daily to VW — expensive and exhausting. Julian found HOME in a student essay. They came for an Easter event — egg hunts, live bands on the rooftop — and met Maximilian, who explained how it all worked. It sparked something. Two months after easter they moved in. A year later they had a child and felt genuinely held by the people around them. They now organise weekly events for other children in the community.",
+    text: "A couple from Hanover, together four years, thinking about starting a family. Sarah commutes daily to VW — expensive and exhausting. Julian found Third Home in a student essay. They came for an Easter event — egg hunts, live bands on the rooftop — and met Maximilian, who explained how it all worked. It sparked something. Two months after easter they moved in. A year later they had a child and felt genuinely held by the people around them. They now organise weekly events for other children in the community.",
     bg: "#ff018f",
     fg: "#ffffff",
     rotate: "1.5deg",
@@ -41,7 +41,7 @@ const SEED_STORIES: Story[] = [
   {
     id: "s3",
     name: "Anouk",
-    text: "Performance artist from Paris. The library job barely covers rent and leaves no room for art. A friend who'd made a temporary installation outside HOME said: 'It felt very wholesome and warm — light and flowy. This random small city in Germany. I'd check it out.' Anouk searched HOME that same evening and contacted Sarah. There was space. And VW partially sponsors HOME without having any say in decisions — so funding the art project was possible. First time Anouk could work as a full-time funded artist. They sold all their furniture on eBay and arrived two weeks later. Since then: creating, teaching, and pulling collaborators in from everywhere.",
+    text: "Performance artist from Paris. The library job barely covers rent and leaves no room for art. A friend who'd made a temporary installation outside Third Home said: 'It felt very wholesome and warm — light and flowy. This random small city in Germany. I'd check it out.' Anouk searched Third Home that same evening and contacted Sarah. There was space. And VW partially sponsors Third Home without having any say in decisions — so funding the art project was possible. First time Anouk could work as a full-time funded artist. They sold all their furniture on eBay and arrived two weeks later. Since then: creating, teaching, and pulling collaborators in from everywhere.",
     bg: "#2a0c62",
     fg: "#ffcc00",
     rotate: "-1deg",
@@ -125,7 +125,7 @@ export default function BackStoriesPage() {
             Back Stories
           </h1>
           <p className="text-base max-w-xl" style={{ color: "var(--muted)" }}>
-            Everyone arrives at HOME with a story. These are a few of them.
+            Everyone arrives at Third Home with a story. These are a few of them.
           </p>
         </div>
         {!showForm && (
@@ -149,7 +149,7 @@ export default function BackStoriesPage() {
             Your back story
           </h2>
           <p className="text-xs mb-5" style={{ color: "var(--muted)" }}>
-            How did you find HOME? What brought you here? Write as much or as little as you like.
+            How did you find Third Home? What brought you here? Write as much or as little as you like.
           </p>
           <div className="space-y-4">
             <div>

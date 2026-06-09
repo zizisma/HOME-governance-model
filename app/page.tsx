@@ -24,7 +24,7 @@ export default function Home() {
           A place to stay.<br />A community to belong to.
         </h1>
         <p className="text-lg max-w-2xl mb-8" style={{ color: "var(--muted)" }}>
-          HOME is a collectively-owned living space in Wolfsburg — for commuters, newcomers, and
+          Third Home is a collectively-owned living space in Wolfsburg — for commuters, newcomers, and
           long-term residents. Run by the people who live here.
         </p>
         <div className="flex gap-4 flex-wrap">

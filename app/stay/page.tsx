@@ -169,7 +169,7 @@ export default function StayPage() {
           <li>· Guests can stay 1–7 nights. For longer stays, talk to a Keeper about becoming a Member.</li>
           <li>· The kitchen is shared. There&apos;s a communal food fund for basics — you can contribute to it.</li>
           <li>· Quiet hours are 10pm–8am Sunday–Thursday, midnight–8am Friday–Saturday.</li>
-          <li>· VW has contributed funding to HOME but has no say in how it&apos;s run. That&apos;s in writing.</li>
+          <li>· VW has contributed funding to Third Home but has no say in how it&apos;s run. That&apos;s in writing.</li>
         </ul>
       </div>
     </div>
