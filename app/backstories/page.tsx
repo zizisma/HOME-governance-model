@@ -104,7 +104,12 @@ export default function BackStoriesPage() {
         setStories((prev) => prev.map((s) => (s.id === optimisticId ? saved : s)));
       } else {
         setStories((prev) => prev.filter((s) => s.id !== optimisticId));
-        setSaveError("Couldn't save your story — please try again.");
+        const body = await res.json().catch(() => ({}));
+        setSaveError(
+          body.error === "KV_NOT_CONFIGURED"
+            ? "The database isn't connected yet — go to your Vercel project → Storage → Connect KV to enable story saving."
+            : "Couldn't save your story — please try again."
+        );
       }
     } catch {
       setStories((prev) => prev.filter((s) => s.id !== optimisticId));
