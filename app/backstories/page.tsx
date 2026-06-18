@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 
 interface Story {
   id: string;
@@ -136,24 +135,15 @@ export default function BackStoriesPage() {
             Everyone arrives at Third Home with a story. These are a few of them.
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap shrink-0">
-          <Link
-            href="/characters"
-            className="px-5 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-90"
-            style={{ background: "var(--warm-brown)", color: "var(--background)" }}
+        {!showForm && (
+          <button
+            onClick={() => setShowForm(true)}
+            className="px-5 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-90 shrink-0"
+            style={{ background: "var(--terracotta)", color: "white" }}
           >
-            Meet the characters →
-          </Link>
-          {!showForm && (
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-5 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-90"
-              style={{ background: "var(--terracotta)", color: "white" }}
-            >
-              + Add your story
-            </button>
-          )}
-        </div>
+            + Add your story
+          </button>
+        )}
       </div>
 
       {/* Add story form */}
