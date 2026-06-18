@@ -56,6 +56,7 @@ export default function BackStoriesPage() {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/stories")
@@ -73,10 +74,12 @@ export default function BackStoriesPage() {
   async function submit() {
     if (!name.trim() || !text.trim() || submitting) return;
     setSubmitting(true);
+    setSaveError(null);
 
     const idx = stories.length;
+    const optimisticId = `u-${Date.now()}`;
     const optimistic: Story = {
-      id: `u-${Date.now()}`,
+      id: optimisticId,
       name: name.trim(),
       text: text.trim(),
       bg: NOTE_COLORS[idx % NOTE_COLORS.length].bg,
@@ -98,10 +101,14 @@ export default function BackStoriesPage() {
       });
       if (res.ok) {
         const saved: Story = await res.json();
-        setStories((prev) => prev.map((s) => (s.id === optimistic.id ? saved : s)));
+        setStories((prev) => prev.map((s) => (s.id === optimisticId ? saved : s)));
+      } else {
+        setStories((prev) => prev.filter((s) => s.id !== optimisticId));
+        setSaveError("Couldn't save your story — please try again.");
       }
     } catch {
-      // story remains visible locally even if the save fails
+      setStories((prev) => prev.filter((s) => s.id !== optimisticId));
+      setSaveError("Couldn't save your story — please try again.");
     }
   }
 
@@ -196,6 +203,22 @@ export default function BackStoriesPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Save error */}
+      {saveError && (
+        <div
+          className="rounded-xl px-5 py-3 mb-6 text-sm flex items-center justify-between gap-4"
+          style={{ background: "#ffe0e0", color: "#7a1a1a" }}
+        >
+          <span>{saveError}</span>
+          <button
+            onClick={() => setSaveError(null)}
+            className="opacity-60 hover:opacity-100 transition-opacity font-bold"
+          >
+            ×
+          </button>
         </div>
       )}
 

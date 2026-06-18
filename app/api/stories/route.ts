@@ -22,38 +22,46 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const { name, text } = await req.json();
-  if (!name?.trim() || !text?.trim()) {
-    return NextResponse.json({ error: "Name and text required" }, { status: 400 });
+  try {
+    const { name, text } = await req.json();
+    if (!name?.trim() || !text?.trim()) {
+      return NextResponse.json({ error: "Name and text required" }, { status: 400 });
+    }
+
+    const count = await kv.llen("backstories");
+    const story = {
+      id: `u-${Date.now()}`,
+      name: name.trim(),
+      text: text.trim(),
+      bg: NOTE_COLORS[count % NOTE_COLORS.length].bg,
+      fg: NOTE_COLORS[count % NOTE_COLORS.length].fg,
+      rotate: ROTATIONS[count % ROTATIONS.length],
+    };
+
+    await kv.lpush("backstories", JSON.stringify(story));
+    return NextResponse.json(story, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Failed to save story" }, { status: 500 });
   }
-
-  const count = await kv.llen("backstories");
-  const story = {
-    id: `u-${Date.now()}`,
-    name: name.trim(),
-    text: text.trim(),
-    bg: NOTE_COLORS[count % NOTE_COLORS.length].bg,
-    fg: NOTE_COLORS[count % NOTE_COLORS.length].fg,
-    rotate: ROTATIONS[count % ROTATIONS.length],
-  };
-
-  await kv.lpush("backstories", JSON.stringify(story));
-  return NextResponse.json(story, { status: 201 });
 }
 
 export async function DELETE(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
-  const raw = await kv.lrange("backstories", 0, -1);
-  for (const item of raw) {
-    const parsed = typeof item === "string" ? JSON.parse(item) : item;
-    if (parsed.id === id) {
-      await kv.lrem("backstories", 0, typeof item === "string" ? item : JSON.stringify(item));
-      break;
+    const raw = await kv.lrange("backstories", 0, -1);
+    for (const item of raw) {
+      const parsed = typeof item === "string" ? JSON.parse(item) : item;
+      if (parsed.id === id) {
+        await kv.lrem("backstories", 0, typeof item === "string" ? item : JSON.stringify(item));
+        break;
+      }
     }
-  }
 
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "Failed to delete story" }, { status: 500 });
+  }
 }
