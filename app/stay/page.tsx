@@ -65,8 +65,8 @@ export default function StayPage() {
       {/* Bed listing */}
       {(["single", "double", "bunk"] as const).map((type) => {
         const rooms = bedSpaces.filter((b) => b.type === type);
-        const label = type === "single" ? "Single Rooms" : type === "double" ? "Double Rooms" : "Bunk Rooms";
-        const cap = type === "single" ? "1 person" : type === "double" ? "2 people" : "4 people";
+        const label = type === "single" ? "Single Rooms" : type === "double" ? "Double Rooms" : "Dorm Rooms";
+        const cap = type === "single" ? "1 person" : type === "double" ? "2 people" : "4–6 people";
         return (
           <div key={type} className="mb-10">
             <div className="flex items-baseline gap-2 mb-4">

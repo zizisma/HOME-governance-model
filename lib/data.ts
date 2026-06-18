@@ -41,6 +41,7 @@ export interface Event {
 export interface BedSpace {
   id: string;
   type: "single" | "double" | "bunk";
+  capacity?: number;
   name: string;
   description: string;
   available: boolean;
@@ -305,8 +306,8 @@ export const bedSpaces: BedSpace[] = [
   {
     id: "bk1",
     type: "bunk",
-    name: "Bunk Room A",
-    description: "Four bunk beds, privacy curtains on each. Best value, great energy.",
+    name: "Dorm Room A",
+    description: "Four beds, privacy curtains on each. Best value, great energy.",
     available: true,
     priceGuest: 15,
     priceMember: 200,
@@ -316,8 +317,8 @@ export const bedSpaces: BedSpace[] = [
   {
     id: "bk2",
     type: "bunk",
-    name: "Bunk Room B",
-    description: "Four bunk beds with individual reading lights and lockable storage.",
+    name: "Dorm Room B",
+    description: "Four beds with individual reading lights and lockable storage.",
     available: false,
     priceGuest: 15,
     priceMember: 200,
@@ -341,28 +342,6 @@ export const bedSpaces: BedSpace[] = [
     type: "single",
     name: "Single F — F2 Street Side",
     description: "Second floor street side. Slightly more noise, great morning light.",
-    available: true,
-    priceGuest: 20,
-    priceMember: 400,
-    priceKeeper: 200,
-    amenities: ["Blackout curtain", "Shared bathroom", "Reading lamp", "Storage locker"],
-  },
-  {
-    id: "s7",
-    type: "single",
-    name: "Single G — F3 Corner",
-    description: "Third floor corner with views on two sides. Bright and quiet.",
-    available: false,
-    priceGuest: 20,
-    priceMember: 400,
-    priceKeeper: 200,
-    amenities: ["Two windows", "Shared bathroom", "Reading lamp", "Storage locker"],
-  },
-  {
-    id: "s8",
-    type: "single",
-    name: "Single H — F3 Street Side",
-    description: "Third floor, higher up means less street noise than the floors below.",
     available: true,
     priceGuest: 20,
     priceMember: 400,
@@ -416,7 +395,7 @@ export const bedSpaces: BedSpace[] = [
   {
     id: "bk3",
     type: "bunk",
-    name: "Bunk Room C — F2",
+    name: "Dorm Room C — F2",
     description: "Second floor bunk room with four beds and a view of the courtyard from the window.",
     available: true,
     priceGuest: 15,
@@ -427,13 +406,36 @@ export const bedSpaces: BedSpace[] = [
   {
     id: "bk4",
     type: "bunk",
-    name: "Bunk Room D — F3",
-    description: "Third floor bunk room. Quieter than the ground floor rooms, great natural light.",
+    name: "Dorm Room D — F3",
+    description: "Third floor dorm. Quieter than the ground floor rooms, great natural light.",
     available: true,
     priceGuest: 15,
     priceMember: 200,
     priceKeeper: 100,
     amenities: ["4 beds", "Privacy curtains", "Shared bathroom", "Lockers", "Reading light"],
+  },
+  {
+    id: "bk5",
+    type: "bunk",
+    name: "Dorm Room E — F3 Garden Side",
+    description: "Four-bed dorm on the third floor, garden-facing. Calm and private for a shared room.",
+    available: true,
+    priceGuest: 15,
+    priceMember: 200,
+    priceKeeper: 100,
+    amenities: ["4 beds", "Garden view", "Privacy curtains", "Shared bathroom", "Lockers", "Reading light"],
+  },
+  {
+    id: "bk6",
+    type: "bunk",
+    capacity: 6,
+    name: "Dorm Room F — F4 Large",
+    description: "Top floor six-bed dorm. The biggest shared room — best value in the house, great community energy.",
+    available: true,
+    priceGuest: 12,
+    priceMember: 160,
+    priceKeeper: 80,
+    amenities: ["6 beds", "Privacy curtains", "Shared bathroom", "Lockers", "Reading light", "Skylight"],
   },
 ];
 
