@@ -13,6 +13,7 @@ const links = [
   { href: "/stay", label: "Stay" },
   { href: "/community", label: "Community" },
   { href: "/backstories", label: "Back Stories" },
+  { href: "/characters", label: "Characters" },
 ];
 
 export default function Nav() {
