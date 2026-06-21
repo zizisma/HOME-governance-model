@@ -44,3 +44,28 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--sand); }
 ::-webkit-scrollbar-thumb { background: var(--sand-dark); border-radius: 3px; }
+
+/* Hover glow + lift on all cards and info boxes */
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rounded-xl:hover,
+.rounded-2xl:hover,
+.rounded-3xl:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(255, 1, 143, 0.18), 0 2px 12px rgba(255, 204, 0, 0.10);
+}
+
+/* Don't lift interactive controls */
+button:hover,
+input:hover,
+textarea:hover,
+select:hover,
+nav .rounded-xl:hover,
+nav .rounded-2xl:hover {
+  transform: none;
+  box-shadow: none;
+}
