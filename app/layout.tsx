@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { RoleProvider } from "@/lib/role-context";
 import Nav from "@/components/Nav";
+import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Third Home — Wolfsburg",
@@ -11,7 +12,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+      <body className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)", cursor: "none" }}>
+        <CustomCursor />
         <RoleProvider>
           <Nav />
           <main>{children}</main>
