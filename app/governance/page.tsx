@@ -860,8 +860,8 @@ export default function GovernancePage() {
             </div>
             <div className="space-y-0.5 text-xs" style={{ color: groupConfig[g].textColor }}>
               <div>Keepers: <span className="font-semibold">2–3</span></div>
-              <div>Members: <span className="font-semibold">8–10</span></div>
-              <div>Guests: <span className="font-semibold">7–10</span></div>
+              <div>Members: <span className="font-semibold">5–7</span></div>
+              <div>Guests: <span className="font-semibold">3–4</span></div>
             </div>
           </div>
         ))}
