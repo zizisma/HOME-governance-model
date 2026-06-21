@@ -1,5 +1,10 @@
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
+
+const redis = new Redis({
+  url: "https://natural-kit-127415.upstash.io",
+  token: "gQAAAAAAAfG3AAIgcDE2YWRlN2VhMjY4ZTI0NDY4YjJmNjVkNmE0ZGNhYzE4Ng",
+});
 
 const NOTE_COLORS = [
   { bg: "#ffcc00", fg: "#11012e" },
@@ -11,14 +16,9 @@ const NOTE_COLORS = [
 
 const ROTATIONS = ["-2deg", "1.5deg", "-1deg", "2deg", "-0.5deg", "1deg"];
 
-function isKvConfigured() {
-  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
-
 export async function GET() {
-  if (!isKvConfigured()) return NextResponse.json([]);
   try {
-    const stories = await kv.lrange("stories", 0, -1);
+    const stories = await redis.lrange("stories", 0, -1);
     return NextResponse.json(stories ?? []);
   } catch {
     return NextResponse.json([]);
@@ -26,16 +26,13 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  if (!isKvConfigured()) {
-    return NextResponse.json({ error: "KV_NOT_CONFIGURED" }, { status: 503 });
-  }
   try {
     const { name, text } = await req.json();
     if (!name?.trim() || !text?.trim()) {
       return NextResponse.json({ error: "Name and text required" }, { status: 400 });
     }
 
-    const count = await kv.llen("stories");
+    const count = await redis.llen("stories");
     const story = {
       id: `u-${Date.now()}`,
       name: name.trim(),
@@ -45,7 +42,7 @@ export async function POST(req: Request) {
       rotate: ROTATIONS[count % ROTATIONS.length],
     };
 
-    await kv.lpush("stories", story);
+    await redis.lpush("stories", story);
     return NextResponse.json(story, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to save story" }, { status: 500 });
@@ -53,17 +50,14 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  if (!isKvConfigured()) {
-    return NextResponse.json({ ok: true });
-  }
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
-    const stories = await kv.lrange("stories", 0, -1) as { id: string }[];
+    const stories = await redis.lrange<{ id: string }>("stories", 0, -1);
     const target = stories.find((s) => s.id === id);
-    if (target) await kv.lrem("stories", 1, target);
+    if (target) await redis.lrem("stories", 1, target);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete story" }, { status: 500 });

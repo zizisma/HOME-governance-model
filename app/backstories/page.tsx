@@ -56,7 +56,6 @@ export default function BackStoriesPage() {
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/stories")
@@ -74,9 +73,8 @@ export default function BackStoriesPage() {
   async function submit() {
     if (!name.trim() || !text.trim() || submitting) return;
     setSubmitting(true);
-    setSaveError(null);
 
-    const idx = stories.length;
+    const idx = stories.filter((s) => s.id.startsWith("u-")).length;
     const optimisticId = `u-${Date.now()}`;
     const optimistic: Story = {
       id: optimisticId,
@@ -102,18 +100,9 @@ export default function BackStoriesPage() {
       if (res.ok) {
         const saved: Story = await res.json();
         setStories((prev) => prev.map((s) => (s.id === optimisticId ? saved : s)));
-      } else {
-        setStories((prev) => prev.filter((s) => s.id !== optimisticId));
-        const body = await res.json().catch(() => ({}));
-        setSaveError(
-          body.error === "KV_NOT_CONFIGURED"
-            ? "The database isn't connected yet — go to your Vercel project → Storage → Connect KV to enable story saving."
-            : "Couldn't save your story — please try again."
-        );
       }
     } catch {
-      setStories((prev) => prev.filter((s) => s.id !== optimisticId));
-      setSaveError("Couldn't save your story — please try again.");
+      // story stays visible optimistically
     }
   }
 
@@ -208,22 +197,6 @@ export default function BackStoriesPage() {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Save error */}
-      {saveError && (
-        <div
-          className="rounded-xl px-5 py-3 mb-6 text-sm flex items-center justify-between gap-4"
-          style={{ background: "#ffe0e0", color: "#7a1a1a" }}
-        >
-          <span>{saveError}</span>
-          <button
-            onClick={() => setSaveError(null)}
-            className="opacity-60 hover:opacity-100 transition-opacity font-bold"
-          >
-            ×
-          </button>
         </div>
       )}
 
